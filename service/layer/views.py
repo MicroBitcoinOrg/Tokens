@@ -1,6 +1,7 @@
 from ..models import Block, Token, Balance
 from ..models import FeeAddress, TokenCost
 from ..models import Transfer, Address
+from ..token_icons import token_icons
 from fastapi import APIRouter
 from ..chain import get_chain
 from ..errors import Abort
@@ -64,7 +65,8 @@ async def tokens_list(
             "transfers": transfers,
             "ticker": token.ticker,
             "type": token.type,
-            "holders": holders
+            "holders": holders,
+            "icon": token_icons.get(token.ticker, None)
         })
 
     return {
@@ -91,7 +93,8 @@ async def token_info(
         "transfers": transfers,
         "ticker": token.ticker,
         "type": token.type,
-        "holders": holders
+        "holders": holders,
+        "icon": token_icons.get(token.ticker, None)
     }
 
 @router.get(
