@@ -3,6 +3,7 @@ from ..models import Balance, Lock
 from ..utils import log_message
 from .. import constants
 
+
 @atomic()
 async def process_reorg(block):
     async for transfer in block.transfers:
@@ -31,7 +32,7 @@ async def process_reorg(block):
 
         if transfer.category == constants.CATEGORY_TRANSFER:
             receiver = await transfer.receiver
-            sender = await transfer.receiver
+            sender = await transfer.sender
             token = await transfer.token
 
             receiver_balance = await Balance.filter(
@@ -81,9 +82,7 @@ async def process_reorg(block):
         address = await lock.address
         token = await lock.token
 
-        balance = await Balance.filter(
-            address=address, token=token
-        ).first()
+        balance = await Balance.filter(address=address, token=token).first()
 
         balance.locked += transfer.value
         balance.value -= transfer.value
