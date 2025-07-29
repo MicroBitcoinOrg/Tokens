@@ -61,13 +61,21 @@ To verify if everything is working properly make request to GET `http://127.0.0.
 ```
 
 Information about token layer sync can be obtained from GET `/layer/latest`
+
 Tokens list GET `/layer/tokens?page=1`
+
 Token info GET `/layer/token/GOLD`
+
 Token holders GET `/layer/token/GOLD/holders`
+
 Token transfers GET `/layer/token/GOLD/transfers`
+
 Transfer info GET `/layer/tx/6e2b66af6c46f0f351bc9875967dbef3feea58cc534ec3c41bf655d8e37edf5c`
+
 Address info/balances GET `/layer/address/BZBemw9yDYy1p5hsypdBysxaT3UETDPY3m`
+
 Address transfers GET `/layer/address/BZBemw9yDYy1p5hsypdBysxaT3UETDPY3m/transfers`
+
 Address transfers for specific token `/layer/address/BZBemw9yDYy1p5hsypdBysxaT3UETDPY3m/transfers/GOLD`
 
 To build token transfer transaction you need to follow this steps:
