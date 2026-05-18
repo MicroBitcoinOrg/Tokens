@@ -211,7 +211,7 @@ class Protocol:
 
                 CostValidation(**payload)
 
-        except ValidationError as e:
+        except (ValidationError, KeyError) as e:
             print("Failed to decode payload:", e)
             return None
 
