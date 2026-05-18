@@ -12,62 +12,79 @@ import config
 
 SNAP_TXID = "3426ccad3017e14a4ab6efddaa44cb31beca67a86c82f63de18705f1b6de88df"
 
+
 @atomic()
 async def process_block(data):
     chain = get_chain(config.chain)
 
-    block = await Block.create(**{
-        "created": data["block"]["created"],
-        "height": data["block"]["height"],
-        "hash": data["block"]["hash"]
-    })
+    block = await Block.create(
+        **{
+            "created": data["block"]["created"],
+            "height": data["block"]["height"],
+            "hash": data["block"]["hash"],
+        }
+    )
 
     if block.height == chain["genesis"]["height"]:
-        await FeeAddress.create(**{
-            "label": chain["cost"]["address"],
-            "height": block.height,
-            "block": block
-        })
+        await FeeAddress.create(
+            **{
+                "label": chain["cost"]["address"],
+                "height": block.height,
+                "block": block,
+            }
+        )
 
-        await TokenCost.bulk_create([
-            # Create
-            TokenCost(**{
-                "value": chain["cost"]["create"]["root"],
-                "action": constants.ACTION_CREATE,
-                "type": constants.TOKEN_ROOT,
-                "height": block.height,
-                "block": block
-            }),
-            TokenCost(**{
-                "value": chain["cost"]["create"]["sub"],
-                "action": constants.ACTION_CREATE,
-                "type": constants.TOKEN_SUB,
-                "height": block.height,
-                "block": block
-            }),
-            TokenCost(**{
-                "value": chain["cost"]["create"]["unique"],
-                "action": constants.ACTION_CREATE,
-                "type": constants.TOKEN_UNIQUE,
-                "height": block.height,
-                "block": block
-            }),
-            # Issue
-            TokenCost(**{
-                "value": chain["cost"]["issue"]["root"],
-                "action": constants.ACTION_ISSUE,
-                "type": constants.TOKEN_ROOT,
-                "height": block.height,
-                "block": block
-            }),
-            TokenCost(**{
-                "value": chain["cost"]["issue"]["sub"],
-                "action": constants.ACTION_ISSUE,
-                "type": constants.TOKEN_SUB,
-                "height": block.height,
-                "block": block
-            })
-        ])
+        await TokenCost.bulk_create(
+            [
+                # Create
+                TokenCost(
+                    **{
+                        "value": chain["cost"]["create"]["root"],
+                        "action": constants.ACTION_CREATE,
+                        "type": constants.TOKEN_ROOT,
+                        "height": block.height,
+                        "block": block,
+                    }
+                ),
+                TokenCost(
+                    **{
+                        "value": chain["cost"]["create"]["sub"],
+                        "action": constants.ACTION_CREATE,
+                        "type": constants.TOKEN_SUB,
+                        "height": block.height,
+                        "block": block,
+                    }
+                ),
+                TokenCost(
+                    **{
+                        "value": chain["cost"]["create"]["unique"],
+                        "action": constants.ACTION_CREATE,
+                        "type": constants.TOKEN_UNIQUE,
+                        "height": block.height,
+                        "block": block,
+                    }
+                ),
+                # Issue
+                TokenCost(
+                    **{
+                        "value": chain["cost"]["issue"]["root"],
+                        "action": constants.ACTION_ISSUE,
+                        "type": constants.TOKEN_ROOT,
+                        "height": block.height,
+                        "block": block,
+                    }
+                ),
+                TokenCost(
+                    **{
+                        "value": chain["cost"]["issue"]["sub"],
+                        "action": constants.ACTION_ISSUE,
+                        "type": constants.TOKEN_SUB,
+                        "height": block.height,
+                        "block": block,
+                    }
+                ),
+            ]
+        )
 
         log_message("Initialized initial cost and fee address")
 
@@ -101,13 +118,15 @@ async def process_block(data):
 
                 # Prevent crash with malformed payload
                 if len(payload) < 4:
+                    # print(f"Bad payload {payload} for {txid}")
                     continue
 
                 # Check chain id
                 chain_id = payload[:2]
                 if chain_id != chain["id"]:
+                    # print(f"Bad chain id {chain_id} for {txid}")
                     continue
-                
+
                 # Decode payload
                 payload_raw = payload[2:]
                 decoded = Protocol.decode(payload_raw)
@@ -121,4 +140,5 @@ async def process_block(data):
                 )
 
         if decoded:
+            # print(f"Successfully decoded {txid}")
             await process_decoded(decoded, inputs, outputs, block, txid)

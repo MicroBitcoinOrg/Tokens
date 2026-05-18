@@ -6,6 +6,7 @@ from ..chain import get_chain
 from ..models import Block
 import config
 
+
 async def emergency_reorg(reorg_height):
     latest = await Block.filter().order_by("-height").limit(1).first()
 
@@ -14,11 +15,10 @@ async def emergency_reorg(reorg_height):
         log_message(f"Found reorg at height #{latest.height}")
 
         reorg_block = latest
-        latest = await Block.filter(
-            height=(latest.height - 1)
-        ).first()
+        latest = await Block.filter(height=(latest.height - 1)).first()
 
         await process_reorg(reorg_block)
+
 
 async def sync_chain():
     # Init genesis
@@ -43,9 +43,7 @@ async def sync_chain():
         log_message(f"Found reorg at height #{latest.height}")
 
         reorg_block = latest
-        latest = await Block.filter(
-            height=(latest.height - 1)
-        ).first()
+        latest = await Block.filter(height=(latest.height - 1)).first()
 
         await process_reorg(reorg_block)
 
@@ -66,5 +64,5 @@ async def sync_chain():
             await process_locks(height)
 
         except KeyboardInterrupt:
-            log_message(f"Keyboard interrupt")
+            log_message("Keyboard interrupt")
             break

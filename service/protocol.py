@@ -4,11 +4,13 @@ from typing import Union
 from . import constants
 import msgpack
 
+
 def int_to_bytes(value: int):
     try:
         return value.to_bytes(10, "big")
     except:
         return None
+
 
 def bytes_to_int(value: bytes):
     try:
@@ -16,9 +18,11 @@ def bytes_to_int(value: bytes):
     except:
         return None
 
+
 class CategoryValidation(BaseModel):
     version: int = Field(ge=constants.MIN_VERSION, le=constants.MAX_VERSION)
     category: int = Field(ge=constants.CREATE, le=constants.COST)
+
 
 class CreateValidation(CategoryValidation):
     decimals: int = Field(ge=constants.MIN_DECIMALS, le=constants.MAX_DECIMALS)
@@ -27,16 +31,18 @@ class CreateValidation(CategoryValidation):
 
     ticker: str = Field(
         min_length=constants.MIN_TICKER_LENGTH,
-        max_length=constants.MAX_TICKER_LENGTH
+        max_length=constants.MAX_TICKER_LENGTH,
     )
+
 
 class IssueValidation(CategoryValidation):
     value: int = Field(ge=1, le=constants.MAX_VALUE)
 
     ticker: str = Field(
         min_length=constants.MIN_TICKER_LENGTH,
-        max_length=constants.MAX_TICKER_LENGTH
+        max_length=constants.MAX_TICKER_LENGTH,
     )
+
 
 class TransferValidation(CategoryValidation):
     lock: Union[int, None] = Field(default=None, ge=1)
@@ -44,21 +50,24 @@ class TransferValidation(CategoryValidation):
 
     ticker: str = Field(
         min_length=constants.MIN_TICKER_LENGTH,
-        max_length=constants.MAX_TICKER_LENGTH
+        max_length=constants.MAX_TICKER_LENGTH,
     )
+
 
 class BurnValidation(CategoryValidation):
     value: int = Field(ge=1, le=constants.MAX_VALUE)
 
     ticker: str = Field(
         min_length=constants.MIN_TICKER_LENGTH,
-        max_length=constants.MAX_TICKER_LENGTH
+        max_length=constants.MAX_TICKER_LENGTH,
     )
+
 
 class CostValidation(CategoryValidation):
     value: int = Field(ge=1, le=constants.MAX_VALUE)
     type: str = Field(regex=constants.TOKEN_TYPE_RE)
     action: str = Field(regex=constants.ACTIONS_RE)
+
 
 class Protocol:
     @classmethod
@@ -81,7 +90,7 @@ class Protocol:
                     "d": data.decimals,
                     "c": data.category,
                     "m": data.version,
-                    "t": data.ticker
+                    "t": data.ticker,
                 }
 
             elif category == constants.ISSUE:
@@ -90,7 +99,7 @@ class Protocol:
                     "v": int_to_bytes(data.value),
                     "c": data.category,
                     "m": data.version,
-                    "t": data.ticker
+                    "t": data.ticker,
                 }
 
             elif category == constants.TRANSFER:
@@ -100,7 +109,7 @@ class Protocol:
                     "c": data.category,
                     "m": data.version,
                     "t": data.ticker,
-                    "l": data.lock
+                    "l": data.lock,
                 }
 
             elif category == constants.BURN:
@@ -109,7 +118,7 @@ class Protocol:
                     "v": int_to_bytes(data.value),
                     "c": data.category,
                     "m": data.version,
-                    "t": data.ticker
+                    "t": data.ticker,
                 }
 
             elif category == constants.COST:
@@ -124,24 +133,15 @@ class Protocol:
 
             elif category == constants.BAN:
                 data = CategoryValidation(**payload)
-                payload = {
-                    "c": data.category,
-                    "m": data.version
-                }
+                payload = {"c": data.category, "m": data.version}
 
             elif category == constants.UNBAN:
                 data = CategoryValidation(**payload)
-                payload = {
-                    "c": data.category,
-                    "m": data.version
-                }
+                payload = {"c": data.category, "m": data.version}
 
             elif category == constants.FEE_ADDRESS:
                 data = CategoryValidation(**payload)
-                payload = {
-                    "c": data.category,
-                    "m": data.version
-                }
+                payload = {"c": data.category, "m": data.version}
 
         except ValidationError as e:
             print("Failed to encode payload:", e)
